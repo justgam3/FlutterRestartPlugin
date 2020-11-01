@@ -24,8 +24,8 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
-  private lateinit var context: Context
-  private lateinit var activity: Activity
+  private var context: Context? = null
+  private var activity: Activity? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_restart")
@@ -52,19 +52,12 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "restartApp") {
-        val intent = context.packageManager.getLaunchIntentForPackage(
-                context.packageName)
+        val intent = context?.packageManager?.getLaunchIntentForPackage(
+                context!!.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        activity.startActivity(intent)
+        activity?.startActivity(intent)
         result.success(true)
-//      val mStartActivity = Intent(context, StartActivity::class.java)
-//      val mPendingIntentId = 123456
-//      val mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT)
-//      val mgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//      mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
-//      System.exit(0)
-      //result.success("Android ${android.os.Build.VERSION.RELEASE}")
     } else {
       result.notImplemented()
     }
@@ -75,7 +68,7 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
   }
 
   override fun onDetachedFromActivity() {
-    activity.finish()
+    activity?.finish()
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
