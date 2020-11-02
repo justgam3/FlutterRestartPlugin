@@ -5,7 +5,9 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.startActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -15,6 +17,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.lang.Exception
 
 
 /** FlutterRestartPlugin */
@@ -55,12 +58,16 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "restartApp") {
+      try{
         val intent = context.packageManager?.getLaunchIntentForPackage(
                 context.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
         activity.startActivity(intent)
         result.success(true)
+      }catch (e : Exception){
+        result.success(false)
+      }
     } else {
       result.notImplemented()
     }
@@ -70,8 +77,9 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
     channel.setMethodCallHandler(null)
   }
 
+  @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   override fun onDetachedFromActivity() {
-
+    activity.releaseInstance()
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {

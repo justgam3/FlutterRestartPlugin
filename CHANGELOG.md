@@ -5,3 +5,7 @@
 ## 0.0.2
 
 * Fixed flutter embedding version problem
+
+## 0.0.3
+
+* Release instance of activity to avoid memory leakage.
