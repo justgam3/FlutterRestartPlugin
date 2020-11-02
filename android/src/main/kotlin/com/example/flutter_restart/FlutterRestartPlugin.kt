@@ -24,8 +24,6 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
-  private var context: Context? = null
-  private var activity: Activity? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_restart")
@@ -43,20 +41,25 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
   // depending on the user's project. onAttachedToEngine or registerWith must both be defined
   // in the same class.
   companion object {
+    private lateinit var context : Context
+    private lateinit var activity : Activity
+
     @JvmStatic
     fun registerWith(registrar: Registrar) {
       val channel = MethodChannel(registrar.messenger(), "flutter_restart")
       channel.setMethodCallHandler(FlutterRestartPlugin())
+      context = registrar.context()
+      activity = registrar.activity()
     }
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "restartApp") {
-        val intent = context?.packageManager?.getLaunchIntentForPackage(
-                context!!.packageName)
+        val intent = context.packageManager?.getLaunchIntentForPackage(
+                context.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        activity?.startActivity(intent)
+        activity.startActivity(intent)
         result.success(true)
     } else {
       result.notImplemented()
@@ -68,7 +71,7 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
   }
 
   override fun onDetachedFromActivity() {
-    activity?.finish()
+
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
