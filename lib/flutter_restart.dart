@@ -10,7 +10,7 @@ class FlutterRestart {
 //    final String version = await _channel.invokeMethod('getPlatformVersion');
 //    return version;
 //  }
-    static Future<bool> restartApp() async{
+    static Future<bool?> restartApp() async{
       final result = await _channel.invokeMethod('restartApp');
       return result;
     }
