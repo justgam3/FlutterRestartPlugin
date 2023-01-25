@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 
@@ -10,7 +11,11 @@ class FlutterRestart {
 //    return version;
 //  }
   static Future<bool> restartApp() async {
-    final result = await _channel.invokeMethod('restartApp');
-    return result;
+    if (Platform.isAndroid) {
+      final result = await _channel.invokeMethod('restartApp');
+      return result;
+    } else {
+      exit(0);
+    }
   }
 }
