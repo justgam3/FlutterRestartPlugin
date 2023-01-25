@@ -45,7 +45,7 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
   // in the same class.
   companion object {
     private lateinit var context : Context
-    private lateinit var activity : Activity
+    private var activity : Activity? = null
 
     @JvmStatic
     fun registerWith(registrar: Registrar) {
@@ -63,7 +63,7 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
                 context.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        activity.startActivity(intent)
+        activity?.startActivity(intent)
         result.success(true)
       }catch (e : Exception){
         result.success(false)
@@ -79,7 +79,7 @@ public class FlutterRestartPlugin: FlutterPlugin, MethodCallHandler, ActivityAwa
 
   @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   override fun onDetachedFromActivity() {
-    activity.releaseInstance()
+    activity?.releaseInstance()
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
